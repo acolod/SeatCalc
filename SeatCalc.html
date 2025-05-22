@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theatre Seat Calculator</title>
+    <title>Venue Seating Calculator</title> 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -58,24 +58,24 @@
             padding: 0.25rem 0.5rem; margin: 0; height: auto;
         }
         .loose-seat-input { width: 60px; text-align: right; }
-        .row-length-input { width: 80px; text-align: right; }
+        .row-length-input { width: 80px; text-align: right; } /* For table inline edit */
         .section-name-input { width: 100%; }
 
+        .result-display-label { 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: #374151; 
+            margin-bottom: 0.25rem; 
+            text-align: left; 
+        }
         .result-display-container { 
             display: flex;
             align-items: stretch; 
             gap: 1rem; 
-            margin-top: 1.5rem; 
+            margin-top: 0.5rem; 
         }
-        .result-display-wrapper { 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column;
-        }
-        .result-display-wrapper .input-label {
-            margin-bottom: 0.25rem; 
-        }
-        .result-display {
+
+        .result-display { 
             background-color: #eef2ff; 
             color: var(--accent-color);
             border: 1px solid var(--accent-color-focus-ring);
@@ -87,7 +87,6 @@
             display: flex; 
             align-items: center;
             justify-content: center;
-            flex-grow: 1; 
         }
         .info-text { font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem; } 
         
@@ -98,7 +97,6 @@
             padding: 0.75rem 1.5rem; 
             border-radius: 0.375rem; 
             transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s; 
-            width: 100%; 
             margin-top: 1.5rem; 
             box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
             display: flex; 
@@ -114,95 +112,56 @@
         }
         
         #addToListButton { 
-            width: auto; 
             margin-top: 0; 
-            flex-shrink: 0; 
             background-color: var(--accent-color);
-            align-self: stretch; 
         }
          #addToListButton:hover {
             background-color: var(--accent-color-darker);
         }
-
 
         .export-button { background-color: var(--export-color); } 
         .export-button:hover { background-color: var(--export-color-darker); }
         .import-button { background-color: var(--import-color); } 
         .import-button:hover { background-color: var(--import-color-darker); }
 
-        /* --- HTML Table Styling --- */
         .seating-summary-table {
-            width: 100%;
-            border-collapse: collapse; /* Crucial for clean borders */
-            margin-top: 0.5rem;
-            border: 1px solid #e5e7eb; /* Outer border for the table */
-            border-radius: 0.5rem; /* Will be clipped by overflow:hidden on wrapper */
-            font-size: 0.875rem;
+            width: 100%; border-collapse: collapse; margin-top: 0.5rem;
+            border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem;
         }
-        .list-table-wrapper { /* Added wrapper for overflow:hidden to respect border-radius */
-             border-radius: 0.5rem;
-             overflow: hidden;
+        .list-table-wrapper { 
+             border-radius: 0.5rem; overflow: hidden;
              box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px 0 rgba(0,0,0,0.03); 
         }
-
         .seating-summary-table th, .seating-summary-table td {
-            padding: 0.875rem 0.75rem;
-            text-align: left;
-            border: 1px solid #e5e7eb; /* Border for all cells */
+            padding: 0.875rem 0.75rem; text-align: left; border: 1px solid #e5e7eb; 
         }
-        .seating-summary-table th {
-            background-color: #f9fafb; /* gray-50 */
-            font-weight: 500;
-            color: #4b5563; /* gray-600 */
-        }
-        .seating-summary-table td {
-            background-color: #ffffff;
-        }
-        /* Align text right for numeric columns */
+        .seating-summary-table th { background-color: #f9fafb; font-weight: 500; color: #4b5563; }
+        .seating-summary-table td { background-color: #ffffff; }
         .seating-summary-table .text-right { text-align: right; }
         .seating-summary-table .text-center { text-align: center; }
         .seating-summary-table .font-semibold { font-weight: 600; }
         .seating-summary-table .cursor-grab { cursor: grab; }
         .seating-summary-table .cursor-pointer { cursor: pointer; }
-
-        /* Specific column widths - adjust as needed */
         .seating-summary-table .col-w-drag { width: 40px; }
-        .seating-summary-table .col-w-section { /* Auto width or min-width */ }
         .seating-summary-table .col-w-length { width: 110px; }
         .seating-summary-table .col-w-fixed { width: 90px; }
         .seating-summary-table .col-w-loose { width: 90px; }
         .seating-summary-table .col-w-total { width: 90px; }
         .seating-summary-table .col-w-action { width: 80px; }
-
         #emptyListMessage { padding: 1rem; text-align: center; color: #6b7280; }
         .delete-btn {
-            background-color: #fee2e2; 
-            color: #ef4444; 
-            border: 1px solid #fecaca;
-            border-radius: 0.375rem;
-            padding: 0.25rem 0.5rem; font-size: 0.75rem; 
+            background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca;
+            border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 0.75rem; 
             cursor: pointer; transition: background-color 0.2s, color 0.2s, border-color 0.2s; line-height: 1;
         }
         .delete-btn:hover { background-color: #ef4444; color: white; border-color: #ef4444; }
-        
-        .seating-summary-table tfoot td {
-            background-color: #f9fafb;
-            font-weight: 600;
-        }
-        .seating-summary-table tfoot .total-label {
-            text-align: right;
-            padding-right: 0.5rem; /* Space before the value */
-        }
-         .seating-summary-table tfoot .total-value {
-            color: var(--accent-color);
-        }
-
-
-        .dragging { opacity: 0.5; background: #ffe4e6 !important; } /* Ensure dragging style overrides td bg */
+        .seating-summary-table tfoot td { background-color: #f9fafb; font-weight: 600; }
+        .seating-summary-table tfoot .total-label { text-align: right; padding-right: 0.5rem; }
+        .seating-summary-table tfoot .total-value { color: var(--accent-color); }
+        .dragging { opacity: 0.5; background: #ffe4e6 !important; }
         .drag-over-placeholder { height: 2px; background-color: var(--accent-color); margin: 0; display: block;}
         .drag-handle-icon { width: 16px; height: 16px; fill: #9ca3af; }
-
-        .export-container, .import-section-container { margin-top: 1rem; position: relative; }
+        .export-container, .import-button-wrapper { margin-top: 1rem; position: relative; flex-grow: 1; }
         .export-dropdown-content {
             display: none; position: absolute; background-color: #ffffff; min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); z-index: 10; border-radius: 0.375rem; right: 0;
@@ -214,27 +173,29 @@
         }
         .export-dropdown-content button:hover {background-color: #f9fafb}
         .export-container:hover .export-dropdown-content { display: block; }
-
         .modal {
             display: none; position: fixed; z-index: 100; left: 0; top: 0;
-            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); padding-top: 60px;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); 
+            padding-top: 60px; align-items: center; justify-content: center;
         }
         .modal-content {
-            background-color: #ffffff; margin: 5% auto; padding: 24px; border: none;
+            background-color: #ffffff; margin: auto; padding: 24px; border: none;
             width: 80%; max-width: 700px; border-radius: 0.5rem; position: relative;
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
         }
+        #importDataModal .modal-content { max-width: 550px; }
+        #importDataModal .action-button { margin-top: 0.5rem; }
         .close-button {
             color: #9ca3af; float: right; font-size: 28px; font-weight: bold;
             position: absolute; top: 10px; right: 16px;
         }
         .close-button:hover, .close-button:focus { color: #374151; text-decoration: none; cursor: pointer; }
-        #copyTextOutput, #importTextInput {
+        #copyTextOutput, #importTextInput { 
             font-family: 'Courier New', Courier, monospace; white-space: pre; background-color: #f9fafb;
             padding: 1rem; border-radius: 0.375rem; border: 1px solid #e5e7eb;
-            max-height: 400px; overflow-y: auto; margin-bottom: 1rem;
+            max-height: 300px; overflow-y: auto; margin-bottom: 1rem;
         }
-        #importTextInput { min-height: 150px; white-space: pre-wrap; }
+        #importTextInput { min-height: 120px; white-space: pre-wrap; }
         .copy-to-clipboard-button {
             background-color: var(--accent-color); color: white; padding: 0.625rem 1.25rem;
             border: none; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s;
@@ -245,16 +206,28 @@
         #importFeedback.text-red-600 { color: #dc2626; } 
         #importFeedback.text-green-600 { color: #16a34a; } 
 
-        .import-options { display: none; margin-top: 0.5rem; padding: 1rem; border: 1px dashed #d1d5db; border-radius: 0.375rem;}
-        .import-options label { margin-bottom: 0.25rem; display: block; }
-        .import-options input[type="file"], .import-options textarea { margin-bottom: 0.5rem; }
-
+        .calculator-footer {
+            margin-top: 2rem; 
+            padding-top: 1rem; 
+            border-top: 1px solid #e5e7eb; 
+            font-size: 0.75rem; 
+            color: #6b7280; 
+            text-align: center; 
+        }
+        .calculator-footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .calculator-footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="calculator-card w-full max-w-3xl"> <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Theatre Seating Calculator</h1>
-
+    <div class="calculator-card w-full max-w-3xl">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Venue Seating Calculator</h1> 
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 mb-6">
             <div>
                 <label for="venueName" class="input-label block">Venue Name</label>
@@ -264,55 +237,52 @@
                 <label for="sectionLabel" class="input-label block">Section Label</label>
                 <input type="text" id="sectionLabel" class="input-field" placeholder="e.g., Center Orchestra">
             </div>
+            
             <div>
-                <label for="rowLength" class="input-label block">Length of Rows (ft)</label>
-                <input type="number" id="rowLength" class="input-field" placeholder="e.g., 50"> 
+                <label for="rowLengthFeet" class="input-label block">Length of Rows</label>
+                <div class="flex items-center gap-x-2">
+                    <input type="number" id="rowLengthFeet" class="input-field" placeholder="Feet" min="0">
+                    <span class="text-gray-600">ft</span>
+                    <input type="number" id="rowLengthInches" class="input-field" placeholder="Inches" min="0" max="11">
+                    <span class="text-gray-600">in</span>
+                </div>
             </div>
+
             <div>
                 <label for="seatWidth" class="input-label block">Seat Width (inches)</label>
                 <input type="number" id="seatWidth" class="input-field" placeholder="e.g., 22" value="22">
             </div>
-            <div class="md:col-span-2 flex items-center justify-between py-2"> 
-                <span class="input-label mb-0">Double length for other side?</span>
+
+            <div class="flex items-center justify-end md:col-start-1 pt-1"> 
+                <span class="input-label mb-0 mr-3">Double length for other side?</span>
                 <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
                     <input type="checkbox" name="doubleLengthToggle" id="doubleLengthToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
                     <label for="doubleLengthToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                 </div>
             </div>
-        </div>
+            <div></div> </div>
 
-        <div class="result-display-container">
-            <div class="result-display-wrapper">
-                <p class="input-label text-center mb-1">Total Fixed Seats (Current):</p>
-                <div id="totalSeats" class="result-display">0</div>
-            </div>
-            <button id="addToListButton" class="action-button">Add Section to List</button>
+        <div class="mt-6"> <p class="result-display-label">Total Fixed Seats (Current):</p> <div class="result-display-container"> <div id="totalSeats" class="result-display flex-1">0</div> <button id="addToListButton" class="action-button flex-1">Add Section to List</button> </div>
         </div>
-        <p id="calculationDetails" class="info-text text-center mt-2"></p> 
-
-        <h2 class="text-xl font-semibold text-gray-700 mt-8 mb-2 text-center px-2">Venue Seating Summary</h2>
+        <p id="calculationDetails" class="info-text mt-2"></p> 
         
-        <div class="list-table-wrapper"> <table id="seatingListTable" class="seating-summary-table">
+        <h2 class="text-xl font-semibold text-gray-700 mt-8 mb-2 text-center px-2">Venue Seating Summary</h2>
+        <div class="list-table-wrapper">
+            <table id="seatingListTable" class="seating-summary-table">
                 <thead>
                     <tr>
-                        <th class="col-w-drag"></th> <th class="col-w-section">Section</th>
-                        <th class="text-right col-w-length">Row Length (ft)</th>
-                        <th class="text-right col-w-fixed">Fixed Seats</th>
-                        <th class="text-right col-w-loose">Loose Seats</th>
-                        <th class="text-right col-w-total font-semibold">Total Seats</th>
+                        <th class="col-w-drag"></th><th class="col-w-section">Section</th>
+                        <th class="text-right col-w-length">Row Length (ft)</th> <th class="text-right col-w-fixed">Fixed Seats</th>
+                        <th class="text-right col-w-loose">Loose Seats</th> <th class="text-right col-w-total font-semibold">Total Seats</th>
                         <th class="text-center col-w-action">Remove</th>
                     </tr>
                 </thead>
-                <tbody id="seatingList">
-                    </tbody>
+                <tbody id="seatingList"></tbody>
                 <tfoot>
                     <tr class="total-row-bg">
-                        <td class="col-w-drag"></td>
-                        <td class="total-label text-right font-semibold" colspan="1">Overall Total:</td>
-                        <td id="overallTotalLength" class="text-right font-semibold">0</td>
-                        <td id="overallTotalFixedSeats" class="text-right font-semibold">0</td>
-                        <td id="overallTotalLooseSeats" class="text-right font-semibold">0</td>
-                        <td id="overallTotalSeats" class="text-right font-semibold total-value">0</td>
+                        <td class="col-w-drag"></td><td class="total-label text-right font-semibold" colspan="1">Overall Total:</td>
+                        <td id="overallTotalLength" class="text-right font-semibold">0</td><td id="overallTotalFixedSeats" class="text-right font-semibold">0</td>
+                        <td id="overallTotalLooseSeats" class="text-right font-semibold">0</td><td id="overallTotalSeats" class="text-right font-semibold total-value">0</td>
                         <td class="col-w-action"></td>
                     </tr>
                 </tfoot>
@@ -321,36 +291,23 @@
          <p id="emptyListMessageContainer" class="text-center info-text py-4" style="display:none;">No sections added yet.</p>
 
         <div class="flex gap-x-4 mt-4">
+            <div class="import-button-wrapper"> 
+                <button id="openImportModalButton" class="action-button import-button w-full">Import Data</button> </div>
             <div class="export-container"> 
-                <button class="action-button export-button w-full">Export as...</button>
-                <div class="export-dropdown-content">
+                <button class="action-button export-button w-full">Export as...</button> <div class="export-dropdown-content">
                     <button id="exportCsvButton">Export as CSV</button>
-                <button id="copyTextButton">Copy Text</button>
+                    <button id="copyTextButton">Copy Text</button>
+                </div>
             </div>
         </div>
 
-        <div class="import-section-container"> 
-            <button id="toggleImportButton" class="action-button import-button w-full">Import Data</button>
-            <div id="importOptions" class="import-options">
-                <div class="mb-4">
-                    <label for="csvFile" class="input-label">Import from CSV file:</label>
-                    <input type="file" id="csvFile" accept=".csv" class="input-field">
-                    <button id="importCsvButton" class="action-button import-button w-auto px-4 py-2 text-sm mt-1">Import CSV</button>
-                </div>
-                <div>
-                    <label for="importTextInput" class="input-label">Paste text to import:</label>
-                    <textarea id="importTextInput" rows="5" class="input-field"></textarea>
-                    <button id="importTextButton" class="action-button import-button w-auto px-4 py-2 text-sm mt-1">Import Text</button>
-                </div>
-                <p id="importFeedback" class="info-text"></p>
-            </div>
-        </div>
-    </div>
+        <footer class="calculator-footer">
+            Arup | Version 1.0 | <a href="mailto:alex.colodner@arup.com">Help</a> </footer>
     </div>
 
     <div id="copyTextModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" id="closeModalButton">&times;</span>
+            <span class="close-button" id="closeCopyModalButton">&times;</span>
             <h3 class="text-xl font-semibold mb-4">Copy Seating Summary</h3>
             <div id="copyTextOutput"></div>
             <button id="copyToClipboardButton" class="copy-to-clipboard-button">Copy to Clipboard</button>
@@ -358,19 +315,40 @@
         </div>
     </div>
 
+    <div id="importDataModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeImportModalButton">&times;</span>
+            <h3 class="text-xl font-semibold mb-4">Import Seating Data</h3>
+            <div class="mb-4">
+                <label for="csvFile" class="input-label">Import from CSV file:</label>
+                <input type="file" id="csvFile" accept=".csv" class="input-field">
+                <button id="importCsvButton" class="action-button import-button w-auto px-4 py-2 text-sm">Import CSV</button>
+            </div>
+            <div>
+                <label for="importTextInput" class="input-label">Paste text to import:</label>
+                <textarea id="importTextInput" rows="5" class="input-field"></textarea>
+                <button id="importTextButton" class="action-button import-button w-auto px-4 py-2 text-sm">Import Text</button>
+            </div>
+            <p id="importFeedback" class="info-text mt-4"></p>
+        </div>
+    </div>
+
     <script>
-        // Get DOM elements
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM Elements
         const venueNameInput = document.getElementById('venueName');
         const sectionLabelInput = document.getElementById('sectionLabel');
-        const rowLengthInput = document.getElementById('rowLength');
+        // MODIFIED: Get new feet and inches input fields
+        const rowLengthFeetInput = document.getElementById('rowLengthFeet');
+        const rowLengthInchesInput = document.getElementById('rowLengthInches');
+        // const rowLengthInput = document.getElementById('rowLength'); // REMOVED: Old input field
         const seatWidthInput = document.getElementById('seatWidth');
         const doubleLengthToggle = document.getElementById('doubleLengthToggle');
         const totalSeatsDisplay = document.getElementById('totalSeats');
         const calculationDetailsDisplay = document.getElementById('calculationDetails');
         const addToListButton = document.getElementById('addToListButton');
-        const seatingListTbody = document.getElementById('seatingList'); // Now tbody
+        const seatingListTbody = document.getElementById('seatingList');
         const emptyListMessageContainer = document.getElementById('emptyListMessageContainer');
-
 
         const overallTotalLengthDisplay = document.getElementById('overallTotalLength');
         const overallTotalFixedSeatsDisplay = document.getElementById('overallTotalFixedSeats');
@@ -380,26 +358,25 @@
         const exportCsvBtn = document.getElementById('exportCsvButton');
         const copyTextBtn = document.getElementById('copyTextButton');
         const copyTextModal = document.getElementById('copyTextModal');
-        const closeModalButton = document.getElementById('closeModalButton');
+        const closeCopyModalButton = document.getElementById('closeCopyModalButton');
         const copyTextOutput = document.getElementById('copyTextOutput');
         const copyToClipboardButton = document.getElementById('copyToClipboardButton');
         const copyFeedback = document.getElementById('copyFeedback');
 
-        const toggleImportButton = document.getElementById('toggleImportButton');
-        const importOptionsDiv = document.getElementById('importOptions');
+        const openImportModalButton = document.getElementById('openImportModalButton');
+        const importDataModal = document.getElementById('importDataModal');
+        const closeImportModalButton = document.getElementById('closeImportModalButton');
         const csvFileInput = document.getElementById('csvFile');
         const importCsvBtn = document.getElementById('importCsvButton');
         const importTextInput = document.getElementById('importTextInput');
         const importTextBtn = document.getElementById('importTextButton');
         const importFeedback = document.getElementById('importFeedback');
 
-
-        let seatingListData = [];
-        let currentCalculatedFixedSeats = 0;
-        let currentActualRowLengthFt = 0;
-        let currentSeatWidthIn = parseFloat(seatWidthInput.value) || 22;
-
-        let draggedItem = null; // This will be the <tr> element
+        let seatingListData = []; 
+        let currentCalculatedFixedSeats = 0; 
+        let currentActualRowLengthFt = 0; // This will still store the total effective length in feet
+        let currentSeatWidthIn = parseFloat(seatWidthInput.value) || 22; 
+        let draggedItem = null; 
         let placeholder = null; 
 
         const dragHandleSVG = `
@@ -410,20 +387,31 @@
 
         function calculateFixedSeatsForSection(lengthFt, sectionSeatWidthIn) {
             if (lengthFt <= 0 || sectionSeatWidthIn <= 0) return 0;
-            return Math.floor((lengthFt * 12) / sectionSeatWidthIn);
+            return Math.floor((lengthFt * 12) / sectionSeatWidthIn); 
         }
 
+        // MODIFIED: calculateCurrentSectionFixedSeats to use feet and inches inputs
         function calculateCurrentSectionFixedSeats() {
-            const rowLengthFtVal = parseFloat(rowLengthInput.value) || 0;
+            const feet = parseFloat(rowLengthFeetInput.value) || 0;
+            let inches = parseFloat(rowLengthInchesInput.value) || 0;
+
+            // Validate inches
+            if (inches < 0) inches = 0;
+            if (inches > 11) inches = 11; // Cap inches at 11
+            rowLengthInchesInput.value = inches; // Update input if corrected
+
             currentSeatWidthIn = parseFloat(seatWidthInput.value) || 22;
             const isDoubled = doubleLengthToggle.checked;
 
+            const totalInchesInput = (feet * 12) + inches;
+            let rowLengthFtVal = totalInchesInput / 12;
+
             if (rowLengthFtVal <= 0 || currentSeatWidthIn <= 0) {
-                totalSeatsDisplay.textContent = '0';
-                currentCalculatedFixedSeats = 0;
+                totalSeatsDisplay.textContent = '0'; 
+                currentCalculatedFixedSeats = 0; 
                 currentActualRowLengthFt = 0;
-                calculationDetailsDisplay.textContent = 'Please enter valid dimensions.';
-                if (rowLengthFtVal <= 0 && rowLengthInput.value !== '') {
+                calculationDetailsDisplay.textContent = 'Please enter valid dimensions (Length > 0 ft, Seat Width > 0 in).';
+                if (rowLengthFtVal <= 0 && (rowLengthFeetInput.value !== '' || rowLengthInchesInput.value !== '')) {
                      calculationDetailsDisplay.textContent = 'Row length must be greater than 0.';
                 } else if (currentSeatWidthIn <= 0 && seatWidthInput.value !== '') {
                     calculationDetailsDisplay.textContent = 'Seat width must be greater than 0.';
@@ -435,362 +423,323 @@
             if (isDoubled) {
                 effectiveRowLengthFt *= 2;
             }
-            currentActualRowLengthFt = effectiveRowLengthFt;
+            currentActualRowLengthFt = effectiveRowLengthFt; // Store the combined and potentially doubled length in feet
             currentCalculatedFixedSeats = calculateFixedSeatsForSection(effectiveRowLengthFt, currentSeatWidthIn);
             totalSeatsDisplay.textContent = currentCalculatedFixedSeats;
-            calculationDetailsDisplay.textContent = `Calculation: Floor[(${effectiveRowLengthFt.toFixed(1)} ft * 12) / ${currentSeatWidthIn} inches] = ${currentCalculatedFixedSeats} fixed seats`;
-        }
-        seatWidthInput.addEventListener('input', calculateCurrentSectionFixedSeats);
+            
+            // Update calculation details display
+            const originalLengthStr = `${feet} ft ${inches} in`;
+            const effectiveLengthStr = `${(isDoubled ? feet * 2 : feet)} ft ${(isDoubled ? inches * 2 : inches) % 12} in (adjusted for doubling if any)`; // Simplified display for doubled
+            // More precise effective length for calculation display:
+            const effectiveTotalInches = effectiveRowLengthFt * 12;
 
+            calculationDetailsDisplay.textContent = 
+                `Input: ${originalLengthStr}. Effective Length: ${(effectiveRowLengthFt).toFixed(2)} ft. Calculation: Floor[(${effectiveTotalInches.toFixed(1)} inches) / ${currentSeatWidthIn} inches] = ${currentCalculatedFixedSeats} fixed seats`;
+        }
+
+        // Add event listeners to new feet and inches inputs
+        if(rowLengthFeetInput) rowLengthFeetInput.addEventListener('input', calculateCurrentSectionFixedSeats);
+        if(rowLengthInchesInput) rowLengthInchesInput.addEventListener('input', calculateCurrentSectionFixedSeats);
+        
+        if(seatWidthInput) seatWidthInput.addEventListener('input', calculateCurrentSectionFixedSeats);
+        if(doubleLengthToggle) doubleLengthToggle.addEventListener('change', calculateCurrentSectionFixedSeats);
 
         function renderList() {
-            seatingListTbody.innerHTML = ''; // Clear tbody
-            emptyListMessageContainer.style.display = seatingListData.length === 0 ? 'block' : 'none';
-
+            if(!seatingListTbody) return; 
+            seatingListTbody.innerHTML = ''; 
+            if(emptyListMessageContainer) emptyListMessageContainer.style.display = seatingListData.length === 0 ? 'block' : 'none';
             let totalLength = 0, totalFixed = 0, totalLoose = 0, grandTotal = 0;
 
-            if (seatingListData.length > 0) {
-                seatingListData.forEach((item, index) => {
-                    const row = seatingListTbody.insertRow();
-                    row.setAttribute('draggable', 'true');
-                    row.dataset.index = index;
-                    row.className = 'list-item-row-table'; // Add a class for potential specific styling if needed
-
-                    const sectionTotal = item.fixedSeats + item.looseSeats;
-
-                    row.innerHTML = `
-                        <td class="text-center cursor-grab col-w-drag">${dragHandleSVG}</td>
-                        <td class="editable col-w-section" data-field="section" data-index="${index}"><span class="display-value">${item.section}</span></td>
-                        <td class="text-right editable col-w-length" data-field="rowLengthFt" data-index="${index}"><span class="display-value">${item.rowLengthFt.toFixed(1)}</span></td>
-                        <td class="text-right col-w-fixed"><span>${item.fixedSeats}</span></td>
-                        <td class="text-right editable col-w-loose" data-field="looseSeats" data-index="${index}"><span class="display-value">${item.looseSeats}</span></td>
-                        <td class="text-right font-semibold col-w-total"><span>${sectionTotal}</span></td>
-                        <td class="text-center col-w-action"><button class="delete-btn" data-index="${index}" title="Remove section">X</button></td>
-                    `;
-                    
-                    totalLength += item.rowLengthFt; totalFixed += item.fixedSeats; totalLoose += item.looseSeats; grandTotal += sectionTotal;
-                });
-            }
-            overallTotalLengthDisplay.textContent = `${totalLength.toFixed(1)}`;
-            overallTotalFixedSeatsDisplay.textContent = totalFixed;
-            overallTotalLooseSeatsDisplay.textContent = totalLoose;
-            overallTotalSeatsDisplay.textContent = grandTotal;
-            attachListEventListeners();
+            seatingListData.forEach((item, index) => {
+                const row = seatingListTbody.insertRow();
+                row.setAttribute('draggable', 'true'); row.dataset.index = index; row.className = 'list-item-row-table';
+                const sectionTotal = item.fixedSeats + item.looseSeats;
+                // Display rowLengthFt (which is total decimal feet) in the table
+                row.innerHTML = `
+                    <td class="text-center cursor-grab col-w-drag">${dragHandleSVG}</td>
+                    <td class="editable col-w-section" data-field="section" data-index="${index}"><span class="display-value">${item.section}</span></td>
+                    <td class="text-right editable col-w-length" data-field="rowLengthFt" data-index="${index}"><span class="display-value">${item.rowLengthFt.toFixed(2)}</span></td>
+                    <td class="text-right col-w-fixed"><span>${item.fixedSeats}</span></td>
+                    <td class="text-right editable col-w-loose" data-field="looseSeats" data-index="${index}"><span class="display-value">${item.looseSeats}</span></td>
+                    <td class="text-right font-semibold col-w-total"><span>${sectionTotal}</span></td>
+                    <td class="text-center col-w-action"><button class="delete-btn" data-index="${index}" title="Remove section">X</button></td>`;
+                totalLength += item.rowLengthFt; totalFixed += item.fixedSeats; totalLoose += item.looseSeats; grandTotal += sectionTotal;
+            });
+            if(overallTotalLengthDisplay) overallTotalLengthDisplay.textContent = `${totalLength.toFixed(2)}`; // Display with 2 decimal places
+            if(overallTotalFixedSeatsDisplay) overallTotalFixedSeatsDisplay.textContent = totalFixed;
+            if(overallTotalLooseSeatsDisplay) overallTotalLooseSeatsDisplay.textContent = totalLoose;
+            if(overallTotalSeatsDisplay) overallTotalSeatsDisplay.textContent = grandTotal;
+            attachListEventListeners(); 
         }
 
+        // makeCellEditable will still edit rowLengthFt as a single decimal value
         function makeCellEditable(cellElement) {
-            const field = cellElement.dataset.field;
+            const field = cellElement.dataset.field; 
             const index = parseInt(cellElement.dataset.index);
             const displaySpan = cellElement.querySelector('.display-value');
+            if(!displaySpan) return; 
+
             const currentValue = (field === "section") ? seatingListData[index][field] : parseFloat(seatingListData[index][field]);
             const input = document.createElement('input');
             input.className = 'inline-edit-input';
-            if (field === "section") { input.type = 'text'; input.className += ' section-name-input'; }
-            else { input.type = 'number'; input.min = "0";
-                if (field === "rowLengthFt") input.className += ' row-length-input';
+            if (field === "section") { input.type = 'text'; input.className += ' section-name-input'; } 
+            else { 
+                input.type = 'number'; 
+                input.min = "0";
+                if (field === "rowLengthFt") {
+                    input.className += ' row-length-input';
+                    input.step = "0.01"; // Allow decimals for feet input in table
+                }
                 if (field === "looseSeats") input.className += ' loose-seat-input';
             }
-            input.value = (field === "rowLengthFt") ? currentValue.toFixed(1) : currentValue;
+            // For rowLengthFt, display and edit as decimal with 2 places
+            input.value = (field === "rowLengthFt") ? currentValue.toFixed(2) : currentValue;
             
-            // Temporarily remove padding from cell for input to fit better
-            const originalPadding = cellElement.style.padding;
-            cellElement.style.padding = '0.25rem'; // Minimal padding for input
-
-            displaySpan.style.display = 'none'; 
-            cellElement.insertBefore(input, displaySpan); // Insert before span
+            const originalPadding = cellElement.style.padding; cellElement.style.padding = '0.25rem'; 
+            displaySpan.style.display = 'none'; cellElement.insertBefore(input, displaySpan); 
             input.focus(); input.select();
 
             const saveChanges = () => {
                 let newValue;
-                if (field === "section") { newValue = input.value.trim() || "Unnamed Section"; }
+                if (field === "section") newValue = input.value.trim() || "Unnamed Section"; 
                 else { newValue = parseFloat(input.value) || 0; newValue = Math.max(0, newValue); }
+                
                 seatingListData[index][field] = newValue;
+                // If rowLengthFt is edited in the table, recalculate fixed seats
                 if (field === "rowLengthFt") {
                     seatingListData[index].fixedSeats = calculateFixedSeatsForSection(newValue, seatingListData[index].seatWidthIn);
                 }
-                 // No need to remove input here, renderList will rebuild the cell
                 renderList(); 
             };
             const cancelChanges = () => {
-                cellElement.style.padding = originalPadding; // Restore padding
-                displaySpan.style.display = 'inline';
-                if(input.parentNode) input.parentNode.removeChild(input);
+                cellElement.style.padding = originalPadding; displaySpan.style.display = 'inline'; 
+                if(input.parentNode) input.parentNode.removeChild(input); 
             }
-
-            input.addEventListener('blur', () => { 
-                // Check if the click was on the delete button within the same row
-                // This is a bit tricky as blur fires before click on another element.
-                // A small timeout can help, or a flag set by mousedown on delete.
-                // For now, just save. If delete is clicked, renderList will handle it.
-                setTimeout(saveChanges, 150); 
-            });
+            input.addEventListener('blur', () => { setTimeout(saveChanges, 150); });
             input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { input.blur(); }
-                else if (e.key === 'Escape') { cancelChanges(); }
+                if (e.key === 'Enter') input.blur(); 
+                else if (e.key === 'Escape') cancelChanges(); 
             });
         }
 
         function attachListEventListeners() {
-            seatingListTbody.querySelectorAll('tr').forEach(row => { // Target <tr> elements
+            if(!seatingListTbody) return; 
+            seatingListTbody.querySelectorAll('tr').forEach(row => {
                 const deleteButton = row.querySelector('.delete-btn');
-                if (deleteButton) { deleteButton.addEventListener('click', function(e) { e.stopPropagation(); seatingListData.splice(parseInt(this.dataset.index), 1); renderList(); }); }
-                
-                row.addEventListener('dragstart', handleDragStart); 
-                row.addEventListener('dragover', handleDragOver);
-                row.addEventListener('drop', handleDrop); 
-                row.addEventListener('dragend', handleDragEnd);
-
-                row.querySelectorAll('.editable').forEach(cell => { // Target <td> elements with .editable
+                if (deleteButton) { deleteButton.addEventListener('click', function(e) { 
+                    e.stopPropagation(); seatingListData.splice(parseInt(this.dataset.index), 1); renderList(); }); }
+                row.addEventListener('dragstart', handleDragStart); row.addEventListener('dragover', handleDragOver);
+                row.addEventListener('drop', handleDrop); row.addEventListener('dragend', handleDragEnd);
+                row.querySelectorAll('.editable').forEach(cell => {
                     cell.addEventListener('click', function(event) {
-                        event.stopPropagation(); if (event.target.tagName === 'INPUT' || event.target.closest('.inline-edit-input')) return;
+                        event.stopPropagation(); 
+                        if (event.target.tagName === 'INPUT' || event.target.closest('.inline-edit-input')) return;
                         makeCellEditable(this);
                     });
                 });
             });
         }
 
-        function handleDragStart(e) { if (e.target.tagName === 'INPUT' || e.target.closest('.inline-edit-input')) { e.preventDefault(); return; } draggedItem = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', this.dataset.index); setTimeout(() => { this.classList.add('dragging'); }, 0); if (!placeholder) { placeholder = document.createElement('tr'); placeholder.innerHTML = `<td colspan="7" class="drag-over-placeholder">&nbsp;</td>`; } }
-        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetRow = e.target.closest('tr'); if (targetRow && targetRow.parentNode === seatingListTbody && targetRow !== placeholder && targetRow !== draggedItem) { const rect = targetRow.getBoundingClientRect(); const isAfter = e.clientY > rect.top + rect.height / 2; if (isAfter) { targetRow.parentNode.insertBefore(placeholder, targetRow.nextSibling); } else { targetRow.parentNode.insertBefore(placeholder, targetRow); } } return false; }
-        function handleDrop(e) { e.stopPropagation(); e.preventDefault(); if (draggedItem && draggedItem !== this) { const fromIndex = parseInt(draggedItem.dataset.index); let toElement = e.target.closest('tr'); let toIndex; if (placeholder.previousSibling === draggedItem) { // Dragged down
-            toIndex = Array.from(seatingListTbody.children).indexOf(placeholder.nextSibling ? placeholder.nextSibling : placeholder) -1;
-             if (placeholder.nextSibling === null) toIndex = seatingListData.length -1; // last item
-        } else if (placeholder.nextSibling === draggedItem) { // Dragged up
-             toIndex = Array.from(seatingListTbody.children).indexOf(placeholder);
-        } else { // General case, find placeholder's position
-            toIndex = Array.from(seatingListTbody.children).indexOf(placeholder);
+        function handleDragStart(e) { 
+            if (e.target.tagName === 'INPUT' || e.target.closest('.inline-edit-input')) { e.preventDefault(); return; } 
+            draggedItem = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', this.dataset.index); 
+            setTimeout(() => { this.classList.add('dragging'); }, 0); 
+            if (!placeholder) { placeholder = document.createElement('tr'); placeholder.innerHTML = `<td colspan="7" class="drag-over-placeholder">&nbsp;</td>`;}
+        }
+        function handleDragOver(e) { 
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetRow = e.target.closest('tr');
+            if (targetRow && targetRow.parentNode === seatingListTbody && targetRow !== placeholder && targetRow !== draggedItem) {
+                const rect = targetRow.getBoundingClientRect(); const isAfter = e.clientY > rect.top + rect.height / 2;
+                if (isAfter) targetRow.parentNode.insertBefore(placeholder, targetRow.nextSibling);
+                else targetRow.parentNode.insertBefore(placeholder, targetRow);
+            } return false; 
+        }
+        function handleDrop(e) { 
+            e.stopPropagation(); e.preventDefault();
+            if (draggedItem && draggedItem !== this) {
+                const fromIndex = parseInt(draggedItem.dataset.index); let toIndex;
+                if (placeholder.previousSibling === draggedItem) { 
+                    toIndex = Array.from(seatingListTbody.children).indexOf(placeholder.nextSibling ? placeholder.nextSibling : placeholder) -1;
+                    if (placeholder.nextSibling === null) toIndex = seatingListData.length -1; 
+                } else if (placeholder.nextSibling === draggedItem) { 
+                    toIndex = Array.from(seatingListTbody.children).indexOf(placeholder);
+                } else { toIndex = Array.from(seatingListTbody.children).indexOf(placeholder); }
+                if (toIndex > fromIndex && placeholder.previousSibling === draggedItem) toIndex--;
+                if (toIndex < 0 || toIndex >= seatingListData.length) toIndex = Array.from(seatingListTbody.children).indexOf(this); 
+                const itemToMove = seatingListData.splice(fromIndex, 1)[0]; seatingListData.splice(toIndex, 0, itemToMove); 
+            } 
+            if (draggedItem) draggedItem.classList.remove('dragging'); 
+            if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder); 
+            draggedItem = null; placeholder = null; renderList(); return false; 
+        }
+        function handleDragEnd() { 
+            if (draggedItem) draggedItem.classList.remove('dragging'); 
+            if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder); 
+            draggedItem = null; placeholder = null; 
         }
 
-        // Adjust if placeholder is before the dragged item's original position
-        if (toIndex > fromIndex && placeholder.previousSibling === draggedItem) toIndex--;
-
-
-        if (toIndex < 0 || toIndex >= seatingListData.length) { // Fallback if index is out of bounds
-            toIndex = Array.from(seatingListTbody.children).indexOf(this);
-        }
-
-
-        const itemToMove = seatingListData.splice(fromIndex, 1)[0]; 
-        seatingListData.splice(toIndex, 0, itemToMove); 
-        } 
-        if (draggedItem) draggedItem.classList.remove('dragging'); 
-        if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder); 
-        draggedItem = null; placeholder = null; // Reset placeholder
-        renderList(); return false; 
-    }
-        function handleDragEnd() { if (draggedItem) { draggedItem.classList.remove('dragging'); } if (placeholder && placeholder.parentNode) { placeholder.parentNode.removeChild(placeholder); } draggedItem = null; placeholder = null; }
-
-        addToListButton.addEventListener('click', () => {
+        if(addToListButton) addToListButton.addEventListener('click', () => {
             const section = sectionLabelInput.value.trim() || 'Unnamed Section';
-            calculateCurrentSectionFixedSeats();
+            calculateCurrentSectionFixedSeats(); // This now uses currentActualRowLengthFt which is derived from feet/inches
             if (currentCalculatedFixedSeats >= 0 && currentActualRowLengthFt > 0) {
-                seatingListData.push({ section: section, rowLengthFt: currentActualRowLengthFt, fixedSeats: currentCalculatedFixedSeats, looseSeats: 0, seatWidthIn: currentSeatWidthIn });
-                renderList(); sectionLabelInput.value = ''; sectionLabelInput.focus();
-            } else { calculationDetailsDisplay.textContent = "Cannot add to list. Ensure dimensions are valid."; }
+                // currentActualRowLengthFt is already the effective length in decimal feet
+                seatingListData.push({ 
+                    section, 
+                    rowLengthFt: currentActualRowLengthFt, // Store the calculated decimal feet
+                    fixedSeats: currentCalculatedFixedSeats, 
+                    looseSeats: 0, 
+                    seatWidthIn: currentSeatWidthIn 
+                });
+                renderList(); 
+                sectionLabelInput.value = ''; 
+                rowLengthFeetInput.value = ''; // Clear feet input
+                rowLengthInchesInput.value = ''; // Clear inches input
+                sectionLabelInput.focus();
+            } else calculationDetailsDisplay.textContent = "Cannot add to list. Ensure dimensions are valid.";
         });
 
-        rowLengthInput.addEventListener('input', calculateCurrentSectionFixedSeats);
-        doubleLengthToggle.addEventListener('change', calculateCurrentSectionFixedSeats);
+        if(exportCsvBtn) exportCsvBtn.addEventListener('click', generateCsv);
+        if(copyTextBtn) copyTextBtn.addEventListener('click', () => {
+            if(copyTextOutput) copyTextOutput.textContent = formatTextForCopy(); 
+            if(copyTextModal) copyTextModal.style.display = "flex"; 
+            if(copyFeedback) copyFeedback.textContent = ""; 
+        });
+        if(closeCopyModalButton) closeCopyModalButton.addEventListener('click', () => { if(copyTextModal) copyTextModal.style.display = "none"; }); 
 
-        function generateCsv() {
-            if (seatingListData.length === 0) { console.log("List is empty."); return; }
-            let csvContent = "data:text/csv;charset=utf-8,";
-            const venue = venueNameInput.value.trim();
-            if (venue) { csvContent += `Venue: ${venue}\n\n`; }
+        if(copyToClipboardButton) copyToClipboardButton.addEventListener('click', () => {
+            const textToCopy = copyTextOutput.textContent; const textArea = document.createElement("textarea"); 
+            textArea.value = textToCopy; textArea.style.position = "fixed"; document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            try { document.execCommand('copy'); copyFeedback.textContent = "Copied!"; setTimeout(() => { copyFeedback.textContent = ""; }, 2000); } 
+            catch (err) { copyFeedback.textContent = "Failed to copy."; console.error('Fallback: Oops, unable to copy', err); }
+            document.body.removeChild(textArea);
+        });
+
+        if(openImportModalButton) openImportModalButton.addEventListener('click', () => {
+            if(importDataModal) importDataModal.style.display = "flex"; 
+            if(importFeedback) importFeedback.textContent = ""; 
+            if(csvFileInput) csvFileInput.value = ''; 
+            if(importTextInput) importTextInput.value = ''; 
+        });
+        if(closeImportModalButton) closeImportModalButton.addEventListener('click', () => { if(importDataModal) importDataModal.style.display = "none"; });
+
+        window.addEventListener('click', (event) => { 
+            if (event.target == copyTextModal) copyTextModal.style.display = "none";
+            if (event.target == importDataModal) importDataModal.style.display = "none";
+        });
+
+        function generateCsv() { 
+            if (seatingListData.length === 0) { console.log("List is empty. Cannot export CSV."); return; }
+            let csvContent = "data:text/csv;charset=utf-8,"; const venue = venueNameInput.value.trim();
+            if (venue) { csvContent += `Venue: ${venue}\n\n`; } 
             csvContent += "Section,Row Length (ft),Fixed Seats,Loose Seats,Total Section Seats,Seat Width (in)\n";
             let totalLength = 0, totalFixed = 0, totalLoose = 0, grandTotal = 0;
             seatingListData.forEach(item => {
                 const sectionTotal = item.fixedSeats + item.looseSeats;
-                csvContent += `"${item.section.replace(/"/g, '""')}",${item.rowLengthFt.toFixed(1)},${item.fixedSeats},${item.looseSeats},${sectionTotal},${item.seatWidthIn}\n`;
+                // rowLengthFt is stored as decimal, display as such (e.g., 2 decimal places)
+                csvContent += `"${item.section.replace(/"/g, '""')}",${item.rowLengthFt.toFixed(2)},${item.fixedSeats},${item.looseSeats},${sectionTotal},${item.seatWidthIn}\n`;
                 totalLength += item.rowLengthFt; totalFixed += item.fixedSeats; totalLoose += item.looseSeats; grandTotal += sectionTotal;
             });
-            csvContent += `\nTotal,"${totalLength.toFixed(1)}",${totalFixed},${totalLoose},${grandTotal},\n`;
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
+            csvContent += `\nTotal,"${totalLength.toFixed(2)}",${totalFixed},${totalLoose},${grandTotal},\n`;
+            const encodedUri = encodeURI(csvContent); const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
             const fileName = venue ? `${venue.replace(/\s+/g, '_')}_Seating_Summary.csv` : "Seating_Summary.csv";
-            link.setAttribute("download", fileName);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            link.setAttribute("download", fileName); document.body.appendChild(link); link.click(); document.body.removeChild(link); 
+        }
+        function formatTextForCopy() {
+            if (seatingListData.length === 0) return "List is empty."; let output = ""; const venue = venueNameInput.value.trim();
+            if (venue) { output += `Venue: ${venue}\n\n`; }
+            const colHeaders = { section: "Section", length: "Row Length (ft)", fixed: "Fixed Seats", loose: "Loose Seats", totalSec: "Total Seats" };
+            const colWidths = { section: colHeaders.section.length, length: colHeaders.length.length, fixed: colHeaders.fixed.length, loose: colHeaders.loose.length, totalSec: colHeaders.totalSec.length };
+            let totalLength = 0, totalFixed = 0, totalLoose = 0, grandTotalSection = 0;
+            seatingListData.forEach(item => {
+                if (item.section.length > colWidths.section) colWidths.section = item.section.length;
+                const lenStr = item.rowLengthFt.toFixed(2); // Use 2 decimal places for consistency
+                if (lenStr.length > colWidths.length) colWidths.length = lenStr.length;
+                if (String(item.fixedSeats).length > colWidths.fixed) colWidths.fixed = String(item.fixedSeats).length;
+                if (String(item.looseSeats).length > colWidths.loose) colWidths.loose = String(item.looseSeats).length;
+                const sectionTotalStr = String(item.fixedSeats + item.looseSeats); if (sectionTotalStr.length > colWidths.totalSec) colWidths.totalSec = sectionTotalStr.length;
+                totalLength += item.rowLengthFt; totalFixed += item.fixedSeats; totalLoose += item.looseSeats; grandTotalSection += (item.fixedSeats + item.looseSeats);
+            });
+            if (colHeaders.length.length > colWidths.length) colWidths.length = colHeaders.length.length;
+            const pad = (str, width, alignRight = false) => { const s = String(str); const padding = ' '.repeat(Math.max(0, width - s.length)); return alignRight ? padding + s : s + padding; };
+            output += `${pad(colHeaders.section, colWidths.section)} | ${pad(colHeaders.length, colWidths.length, true)} | ${pad(colHeaders.fixed, colWidths.fixed, true)} | ${pad(colHeaders.loose, colWidths.loose, true)} | ${pad(colHeaders.totalSec, colWidths.totalSec, true)}\n`;
+            output += `${'-'.repeat(colWidths.section)}---${'-'.repeat(colWidths.length)}---${'-'.repeat(colWidths.fixed)}---${'-'.repeat(colWidths.loose)}---${'-'.repeat(colWidths.totalSec)}\n`;
+            seatingListData.forEach(item => { const sectionTotal = item.fixedSeats + item.looseSeats; output += `${pad(item.section, colWidths.section)} | ${pad(item.rowLengthFt.toFixed(2), colWidths.length, true)} | ${pad(item.fixedSeats, colWidths.fixed, true)} | ${pad(item.looseSeats, colWidths.loose, true)} | ${pad(sectionTotal, colWidths.totalSec, true)}\n`; });
+            output += `${'-'.repeat(colWidths.section)}---${'-'.repeat(colWidths.length)}---${'-'.repeat(colWidths.fixed)}---${'-'.repeat(colWidths.loose)}---${'-'.repeat(colWidths.totalSec)}\n`;
+            output += `${pad("Total", colWidths.section)} | ${pad(totalLength.toFixed(2), colWidths.length, true)} | ${pad(totalFixed, colWidths.fixed, true)} | ${pad(totalLoose, colWidths.loose, true)} | ${pad(grandTotalSection, colWidths.totalSec, true)}\n`;
+            return output;
         }
 
-        function formatTextForCopy() { if (seatingListData.length === 0) return "List is empty."; let output = ""; const venue = venueNameInput.value.trim(); if (venue) { output += `Venue: ${venue}\n\n`; } const colHeaders = { section: "Section", length: "Row Length (ft)", fixed: "Fixed Seats", loose: "Loose Seats", totalSec: "Total Seats" }; const colWidths = { section: colHeaders.section.length, length: colHeaders.length.length, fixed: colHeaders.fixed.length, loose: colHeaders.loose.length, totalSec: colHeaders.totalSec.length }; let totalLength = 0, totalFixed = 0, totalLoose = 0, grandTotalSection = 0; seatingListData.forEach(item => { if (item.section.length > colWidths.section) colWidths.section = item.section.length; const lenStr = item.rowLengthFt.toFixed(1); if (lenStr.length > colWidths.length) colWidths.length = lenStr.length; if (String(item.fixedSeats).length > colWidths.fixed) colWidths.fixed = String(item.fixedSeats).length; if (String(item.looseSeats).length > colWidths.loose) colWidths.loose = String(item.looseSeats).length; const sectionTotalStr = String(item.fixedSeats + item.looseSeats); if (sectionTotalStr.length > colWidths.totalSec) colWidths.totalSec = sectionTotalStr.length; totalLength += item.rowLengthFt; totalFixed += item.fixedSeats; totalLoose += item.looseSeats; grandTotalSection += (item.fixedSeats + item.looseSeats); }); if (colHeaders.length.length > colWidths.length) colWidths.length = colHeaders.length.length; const pad = (str, width, alignRight = false) => { const s = String(str); const padding = ' '.repeat(Math.max(0, width - s.length)); return alignRight ? padding + s : s + padding; }; output += `${pad(colHeaders.section, colWidths.section)} | ${pad(colHeaders.length, colWidths.length, true)} | ${pad(colHeaders.fixed, colWidths.fixed, true)} | ${pad(colHeaders.loose, colWidths.loose, true)} | ${pad(colHeaders.totalSec, colWidths.totalSec, true)}\n`; output += `${'-'.repeat(colWidths.section)}---${'-'.repeat(colWidths.length)}---${'-'.repeat(colWidths.fixed)}---${'-'.repeat(colWidths.loose)}---${'-'.repeat(colWidths.totalSec)}\n`; seatingListData.forEach(item => { const sectionTotal = item.fixedSeats + item.looseSeats; output += `${pad(item.section, colWidths.section)} | ${pad(item.rowLengthFt.toFixed(1), colWidths.length, true)} | ${pad(item.fixedSeats, colWidths.fixed, true)} | ${pad(item.looseSeats, colWidths.loose, true)} | ${pad(sectionTotal, colWidths.totalSec, true)}\n`; }); output += `${'-'.repeat(colWidths.section)}---${'-'.repeat(colWidths.length)}---${'-'.repeat(colWidths.fixed)}---${'-'.repeat(colWidths.loose)}---${'-'.repeat(colWidths.totalSec)}\n`; output += `${pad("Total", colWidths.section)} | ${pad(totalLength.toFixed(1), colWidths.length, true)} | ${pad(totalFixed, colWidths.fixed, true)} | ${pad(totalLoose, colWidths.loose, true)} | ${pad(grandTotalSection, colWidths.totalSec, true)}\n`; return output; }
-
-        exportCsvBtn.addEventListener('click', generateCsv);
-        copyTextBtn.addEventListener('click', () => { copyTextOutput.textContent = formatTextForCopy(); copyTextModal.style.display = "block"; copyFeedback.textContent = ""; });
-        closeModalButton.addEventListener('click', () => { copyTextModal.style.display = "none"; });
-        window.addEventListener('click', (event) => { if (event.target == copyTextModal) { copyTextModal.style.display = "none"; } });
-        copyToClipboardButton.addEventListener('click', () => { const textToCopy = copyTextOutput.textContent; const textArea = document.createElement("textarea"); textArea.value = textToCopy; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select(); try { document.execCommand('copy'); copyFeedback.textContent = "Copied!"; setTimeout(() => { copyFeedback.textContent = ""; }, 2000); } catch (err) { copyFeedback.textContent = "Failed to copy."; console.error('Fallback: Oops, unable to copy', err); } document.body.removeChild(textArea); });
-
-        toggleImportButton.addEventListener('click', () => {
-            importOptionsDiv.style.display = importOptionsDiv.style.display === 'none' || importOptionsDiv.style.display === '' ? 'block' : 'none';
-            importFeedback.textContent = '';
-        });
-
-        importCsvBtn.addEventListener('click', () => {
-            console.log("Import CSV button clicked."); 
-            const file = csvFileInput.files[0];
-            if (!file) {
-                importFeedback.textContent = "Please select a CSV file.";
-                importFeedback.className = "info-text text-red-600";
-                return;
-            }
+        if(importCsvBtn) importCsvBtn.addEventListener('click', () => { 
+            console.log("Import CSV button clicked."); const file = csvFileInput.files[0];
+            if (!file) { importFeedback.textContent = "Please select a CSV file."; importFeedback.className = "info-text text-red-600"; return; }
             const reader = new FileReader();
             reader.onload = function(event) {
-                console.log("FileReader onload event fired for CSV."); 
-                importFeedback.textContent = "Processing CSV..."; 
-                importFeedback.className = "info-text text-blue-600";
+                console.log("FileReader onload event fired for CSV."); importFeedback.textContent = "Processing CSV..."; importFeedback.className = "info-text text-blue-600"; 
                 try {
-                    let csvData = event.target.result;
-                    if (csvData.startsWith('\uFEFF')) {
-                        csvData = csvData.substring(1);
-                        console.log("BOM removed from CSV data.");
-                    }
-
-                    const lines = csvData.split(/\r\n|\n/);
-                    const newSeatingData = [];
-                    let venueNameFromCsv = "";
-                    let dataStartIndex = 0;
-
-                    for (let i = 0; i < lines.length; i++) {
-                        const currentLineTrimmed = lines[i].trim().toLowerCase();
-                        if (currentLineTrimmed.startsWith("venue:")) {
-                            venueNameFromCsv = lines[i].substring(lines[i].indexOf(":") + 1).trim();
-                            dataStartIndex = i + 1; 
+                    let csvData = event.target.result; if (csvData.startsWith('\uFEFF')) { csvData = csvData.substring(1); console.log("BOM removed from CSV data.");}
+                    const lines = csvData.split(/\r\n|\n/); const newSeatingData = []; let venueNameFromCsv = ""; let dataStartIndex = 0; 
+                    for (let i = 0; i < lines.length; i++) { const currentLineTrimmed = lines[i].trim().toLowerCase();
+                        if (currentLineTrimmed.startsWith("venue:")) { venueNameFromCsv = lines[i].substring(lines[i].indexOf(":") + 1).trim(); dataStartIndex = i + 1; 
                             while(dataStartIndex < lines.length && lines[dataStartIndex].trim() === "") dataStartIndex++; 
-                            if(dataStartIndex < lines.length && lines[dataStartIndex].trim().toLowerCase().startsWith("section,")) dataStartIndex++; 
-                            break; 
-                        }
-                        if (currentLineTrimmed.startsWith("section,")) {
-                            dataStartIndex = i + 1;
-                            break;
-                        }
+                            if(dataStartIndex < lines.length && lines[dataStartIndex].trim().toLowerCase().startsWith("section,")) dataStartIndex++; break; }
+                        if (currentLineTrimmed.startsWith("section,")) { dataStartIndex = i + 1; break; }
                     }
-                     if (dataStartIndex === 0 && lines.length > 0 && lines[0].trim().toLowerCase().startsWith("section,")) {
-                        dataStartIndex = 1;
-                    }
-
+                    if (dataStartIndex === 0 && lines.length > 0 && lines[0].trim().toLowerCase().startsWith("section,")) dataStartIndex = 1;
                     for (let i = dataStartIndex; i < lines.length; i++) {
-                        const lineContent = lines[i].trim();
-                        if (lineContent === "" || lineContent.toLowerCase().startsWith("total,")) continue;
-
-                        const values = [];
-                        let buffer = "";
-                        let inQuotes = false;
-                        for (let j = 0; j < lineContent.length; j++) {
-                            const char = lineContent[j];
-                            if (char === '"') {
-                                if (inQuotes && j + 1 < lineContent.length && lineContent[j+1] === '"') {
-                                    buffer += '"'; j++;
-                                } else { inQuotes = !inQuotes; }
-                            } else if (char === ',' && !inQuotes) {
-                                values.push(buffer); buffer = "";
-                            } else { buffer += char; }
-                        }
-                        values.push(buffer);
-
-                        if (values.length >= 6) {
-                            newSeatingData.push({
-                                section: values[0],
-                                rowLengthFt: parseFloat(values[1]) || 0,
-                                fixedSeats: parseInt(values[2]) || 0,
-                                looseSeats: parseInt(values[3]) || 0,
-                                seatWidthIn: parseFloat(values[5]) || parseFloat(seatWidthInput.value) || 22
-                            });
-                        } else { console.warn("Skipping malformed CSV line:", lineContent, "Parsed values:", values); }
+                        const lineContent = lines[i].trim(); if (lineContent === "" || lineContent.toLowerCase().startsWith("total,")) continue;
+                        const values = []; let buffer = ""; let inQuotes = false;
+                        for (let j = 0; j < lineContent.length; j++) { const char = lineContent[j];
+                            if (char === '"') { if (inQuotes && j + 1 < lineContent.length && lineContent[j+1] === '"') { buffer += '"'; j++; } else { inQuotes = !inQuotes; } }
+                            else if (char === ',' && !inQuotes) { values.push(buffer); buffer = ""; } else { buffer += char; }
+                        } values.push(buffer); 
+                        if (values.length >= 6) { newSeatingData.push({ section: values[0], rowLengthFt: parseFloat(values[1]) || 0, fixedSeats: parseInt(values[2]) || 0, looseSeats: parseInt(values[3]) || 0, seatWidthIn: parseFloat(values[5]) || parseFloat(seatWidthInput.value) || 22 });
+                        } else console.warn("Skipping malformed CSV line:", lineContent, "Parsed values:", values);
                     }
-                    if (newSeatingData.length > 0) {
-                        seatingListData = newSeatingData;
-                        if(venueNameFromCsv) venueNameInput.value = venueNameFromCsv;
-                        renderList();
-                        importFeedback.textContent = "CSV data imported successfully!";
-                        importFeedback.className = "info-text text-green-600";
-                    } else {
-                        importFeedback.textContent = "No valid data found in CSV or CSV format incorrect.";
-                        importFeedback.className = "info-text text-red-600";
-                    }
-                } catch (error) {
-                    importFeedback.textContent = "Error processing CSV file. Ensure format is correct.";
-                    importFeedback.className = "info-text text-red-600"; console.error("CSV Import Error:", error);
-                }
+                    if (newSeatingData.length > 0) { seatingListData = newSeatingData; 
+                        if(venueNameFromCsv) venueNameInput.value = venueNameFromCsv; renderList();
+                        importFeedback.textContent = "CSV data imported successfully!"; importFeedback.className = "info-text text-green-600";
+                        if(importDataModal) setTimeout(() => { importDataModal.style.display = "none"; }, 1500); 
+                    } else { importFeedback.textContent = "No valid data found in CSV or CSV format incorrect."; importFeedback.className = "info-text text-red-600"; }
+                } catch (error) { importFeedback.textContent = "Error processing CSV file. Ensure format is correct."; importFeedback.className = "info-text text-red-600"; console.error("CSV Import Error:", error); }
             };
-            reader.onerror = () => { 
-                importFeedback.textContent = "Failed to read the CSV file.";
-                importFeedback.className = "info-text text-red-600";
-                console.error("FileReader onerror for CSV.");
-            };
-            reader.readAsText(file);
-            csvFileInput.value = '';
+            reader.onerror = () => { importFeedback.textContent = "Failed to read the CSV file."; importFeedback.className = "info-text text-red-600"; console.error("FileReader onerror for CSV."); };
+            reader.readAsText(file); 
         });
 
-        importTextBtn.addEventListener('click', () => {
+        if(importTextBtn) importTextBtn.addEventListener('click', () => { 
             const textData = importTextInput.value;
-            if (!textData.trim()) {
-                importFeedback.textContent = "Please paste text to import.";
-                importFeedback.className = "info-text text-red-600";
-                return;
-            }
+            if (!textData.trim()) { importFeedback.textContent = "Please paste text to import."; importFeedback.className = "info-text text-red-600"; return; }
             try {
-                const lines = textData.split('\n');
-                const newSeatingData = [];
-                let venueNameFromText = "";
-                const globalSeatWidthForTextImport = parseFloat(seatWidthInput.value) || 22;
-                let stage = 'LOOKING_FOR_VENUE_OR_HEADER';
-
-                for (const rawLine of lines) {
-                    const line = rawLine.trim();
-                    if (line === "" && stage !== 'PARSING_DATA') continue; 
-
+                const lines = textData.split('\n'); const newSeatingData = []; let venueNameFromText = "";
+                const globalSeatWidthForTextImport = parseFloat(seatWidthInput.value) || 22; let stage = 'LOOKING_FOR_VENUE_OR_HEADER'; 
+                for (const rawLine of lines) { const line = rawLine.trim(); if (line === "" && stage !== 'PARSING_DATA') continue; 
                     switch (stage) {
                         case 'LOOKING_FOR_VENUE_OR_HEADER':
-                            if (line.toLowerCase().startsWith("venue:")) {
-                                venueNameFromText = line.substring(line.indexOf(":") + 1).trim();
-                            } else if (line.startsWith("Section") && line.includes("Row Length (ft)") && line.includes("Fixed Seats")) {
-                                stage = 'LOOKING_FOR_HEADER_DIVIDER';
-                            }
+                            if (line.toLowerCase().startsWith("venue:")) venueNameFromText = line.substring(line.indexOf(":") + 1).trim();
+                            else if (line.startsWith("Section") && line.includes("Row Length (ft)") && line.includes("Fixed Seats")) stage = 'LOOKING_FOR_HEADER_DIVIDER'; 
                             break;
-                        case 'LOOKING_FOR_HEADER_DIVIDER':
-                            if (line.startsWith("-----")) {
-                                stage = 'PARSING_DATA';
-                            }
-                            break;
+                        case 'LOOKING_FOR_HEADER_DIVIDER': if (line.startsWith("-----")) stage = 'PARSING_DATA'; break;
                         case 'PARSING_DATA':
-                            if (line.startsWith("-----") || line.toLowerCase().startsWith("total")) {
-                                stage = 'FINISHED'; break;
-                            }
-                            if (line === "") continue; 
-                            const parts = line.split('|').map(p => p.trim());
-                            if (parts.length >= 4) { // Section | Length | Fixed | Loose 
-                                newSeatingData.push({
-                                    section: parts[0],
-                                    rowLengthFt: parseFloat(parts[1]) || 0,
-                                    fixedSeats: parseInt(parts[2]) || 0,
-                                    looseSeats: parseInt(parts[3]) || 0,
-                                    seatWidthIn: globalSeatWidthForTextImport
-                                });
-                            } else { console.warn("Skipping malformed data line in text import:", rawLine); }
+                            if (line.startsWith("-----") || line.toLowerCase().startsWith("total")) { stage = 'FINISHED'; break; }
+                            if (line === "") continue; const parts = line.split('|').map(p => p.trim()); 
+                            if (parts.length >= 4) { newSeatingData.push({ section: parts[0], rowLengthFt: parseFloat(parts[1]) || 0, fixedSeats: parseInt(parts[2]) || 0, looseSeats: parseInt(parts[3]) || 0, seatWidthIn: globalSeatWidthForTextImport });
+                            } else console.warn("Skipping malformed data line in text import:", rawLine);
                             break;
-                    }
-                    if (stage === 'FINISHED') break;
+                    } if (stage === 'FINISHED') break; 
                 }
-
-                if (newSeatingData.length > 0) {
-                    seatingListData = newSeatingData;
-                    if(venueNameFromText) venueNameInput.value = venueNameFromText;
-                    renderList();
-                    importFeedback.textContent = "Text data imported successfully!";
-                    importFeedback.className = "info-text text-green-600";
-                } else {
-                    importFeedback.textContent = "No valid data found in text or format incorrect. Ensure header and data rows are present.";
-                    importFeedback.className = "info-text text-red-600";
-                }
-            } catch (error) {
-                importFeedback.textContent = "Error processing pasted text.";
-                importFeedback.className = "info-text text-red-600"; console.error("Text Import Error:", error);
-            }
-            importTextInput.value = '';
+                if (newSeatingData.length > 0) { seatingListData = newSeatingData;
+                    if(venueNameFromText) venueNameInput.value = venueNameFromText; renderList();
+                    importFeedback.textContent = "Text data imported successfully!"; importFeedback.className = "info-text text-green-600";
+                    if(importDataModal) setTimeout(() => { importDataModal.style.display = "none"; }, 1500); 
+                } else { importFeedback.textContent = "No valid data found in text or format incorrect. Ensure header and data rows are present."; importFeedback.className = "info-text text-red-600"; }
+            } catch (error) { importFeedback.textContent = "Error processing pasted text."; importFeedback.className = "info-text text-red-600"; console.error("Text Import Error:", error); }
         });
 
         calculateCurrentSectionFixedSeats();
         renderList();
+    });
     </script>
 
 </body>
